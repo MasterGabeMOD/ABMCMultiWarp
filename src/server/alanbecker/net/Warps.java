@@ -84,36 +84,40 @@ public class Warps extends JavaPlugin implements CommandExecutor {
             return true;
         }
 
-        String warpName = args[0].toLowerCase();
-        String matchedWarpName = config.getConfigurationSection("warps").getKeys(false)
-                .stream()
-                .filter(name -> name.equalsIgnoreCase(warpName))
-                .findFirst()
-                .orElse(null);
+        Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+            String warpName = args[0].toLowerCase();
+            String matchedWarpName = config.getConfigurationSection("warps").getKeys(false)
+                    .stream()
+                    .filter(name -> name.equalsIgnoreCase(warpName))
+                    .findFirst()
+                    .orElse(null);
 
-        if (matchedWarpName == null) {
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Warp " + warpName + " does not exist."));
-            return true;
-        }
+            if (matchedWarpName == null) {
+                Bukkit.getScheduler().runTask(this, () -> player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Warp " + warpName + " does not exist.")));
+                return;
+            }
 
-        List<String> points = config.getStringList("warps." + matchedWarpName);
-        if (points.isEmpty()) {
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Warp " + matchedWarpName + " has no points set."));
-            return true;
-        }
+            List<String> points = config.getStringList("warps." + matchedWarpName);
+            if (points.isEmpty()) {
+                Bukkit.getScheduler().runTask(this, () -> player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Warp " + matchedWarpName + " has no points set.")));
+                return;
+            }
 
-        String randomPoint = points.get(new Random().nextInt(points.size()));
-        String[] coords = randomPoint.split(",");
-        World world = Bukkit.getWorld(coords[0]);
-        if (world == null) {
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7The world for warp " + matchedWarpName + " could not be found."));
-            return true;
-        }
+            String randomPoint = points.get(new Random().nextInt(points.size()));
+            String[] coords = randomPoint.split(",");
+            World world = Bukkit.getWorld(coords[0]);
+            if (world == null) {
+                Bukkit.getScheduler().runTask(this, () -> player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7The world for warp " + matchedWarpName + " could not be found.")));
+                return;
+            }
 
-        Location loc = new Location(world, Double.parseDouble(coords[1]), Double.parseDouble(coords[2]), Double.parseDouble(coords[3]), Float.parseFloat(coords[4]), Float.parseFloat(coords[5]));
-        player.teleport(loc);
-        String warpingMessage = ChatColor.translateAlternateColorCodes('&', getConfig().getString("messages.warping").replace("%warp%", matchedWarpName));
-        player.sendMessage(warpingMessage);
+            Location loc = new Location(world, Double.parseDouble(coords[1]), Double.parseDouble(coords[2]), Double.parseDouble(coords[3]), Float.parseFloat(coords[4]), Float.parseFloat(coords[5]));
+            Bukkit.getScheduler().runTask(this, () -> {
+                player.teleport(loc);
+                String warpingMessage = ChatColor.translateAlternateColorCodes('&', getConfig().getString("messages.warping").replace("%warp%", matchedWarpName));
+                player.sendMessage(warpingMessage);
+            });
+        });
 
         return true;
     }
