@@ -21,6 +21,9 @@ public class Warps extends JavaPlugin implements CommandExecutor {
         this.getCommand("rwarp").setExecutor(this);
         this.getCommand("setpoint").setExecutor(this);
         this.saveDefaultConfig();
+        getConfig().addDefault("messages.warping", "&7Warping to %warp%");
+        getConfig().options().copyDefaults(true);
+        saveConfig();
     }
 
     @Override
@@ -109,7 +112,8 @@ public class Warps extends JavaPlugin implements CommandExecutor {
 
         Location loc = new Location(world, Double.parseDouble(coords[1]), Double.parseDouble(coords[2]), Double.parseDouble(coords[3]), Float.parseFloat(coords[4]), Float.parseFloat(coords[5]));
         player.teleport(loc);
-        player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Warping to " + matchedWarpName));
+        String warpingMessage = ChatColor.translateAlternateColorCodes('&', getConfig().getString("messages.warping").replace("%warp%", matchedWarpName));
+        player.sendMessage(warpingMessage);
 
         return true;
     }
