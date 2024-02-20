@@ -109,7 +109,7 @@ public class Warps extends JavaPlugin implements CommandExecutor {
 
         Location loc = new Location(world, Double.parseDouble(coords[1]), Double.parseDouble(coords[2]), Double.parseDouble(coords[3]), Float.parseFloat(coords[4]), Float.parseFloat(coords[5]));
         player.teleport(loc);
-        player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Teleported to " + matchedWarpName));
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Warping to " + matchedWarpName));
 
         return true;
     }
