@@ -64,11 +64,11 @@ public class Warps extends JavaPlugin implements CommandExecutor {
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Usage: /rwarp create <warpName>"));
             return true;
         }
-        String warpName = args[1];
+        String warpName = args[1].toLowerCase();
         if (config.contains("warps." + warpName)) {
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Warp " + warpName + " already exists."));
         } else {
-            config.set("warps." + warpName, new ArrayList<String>());
+            config.set("warps." + warpName, new ArrayList<>());
             this.saveConfig();
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Warp " + warpName + " created."));
         }
@@ -81,10 +81,21 @@ public class Warps extends JavaPlugin implements CommandExecutor {
             return true;
         }
 
-        String warpName = args[0];
-        List<String> points = config.getStringList("warps." + warpName);
+        String warpName = args[0].toLowerCase();
+        String matchedWarpName = config.getConfigurationSection("warps").getKeys(false)
+                .stream()
+                .filter(name -> name.equalsIgnoreCase(warpName))
+                .findFirst()
+                .orElse(null);
+
+        if (matchedWarpName == null) {
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Warp " + warpName + " does not exist."));
+            return true;
+        }
+
+        List<String> points = config.getStringList("warps." + matchedWarpName);
         if (points.isEmpty()) {
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Warp " + warpName + " does not exist or has no points."));
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Warp " + matchedWarpName + " has no points set."));
             return true;
         }
 
@@ -92,12 +103,13 @@ public class Warps extends JavaPlugin implements CommandExecutor {
         String[] coords = randomPoint.split(",");
         World world = Bukkit.getWorld(coords[0]);
         if (world == null) {
-            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7The world for warp " + warpName + " could not be found."));
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7The world for warp " + matchedWarpName + " could not be found."));
             return true;
         }
+
         Location loc = new Location(world, Double.parseDouble(coords[1]), Double.parseDouble(coords[2]), Double.parseDouble(coords[3]), Float.parseFloat(coords[4]), Float.parseFloat(coords[5]));
         player.teleport(loc);
-        player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Teleported to " + warpName));
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Teleported to " + matchedWarpName));
 
         return true;
     }
@@ -108,7 +120,7 @@ public class Warps extends JavaPlugin implements CommandExecutor {
             return true;
         }
 
-        String warpName = args[0];
+        String warpName = args[0].toLowerCase();
         if (!config.contains("warps." + warpName)) {
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Warp " + warpName + " does not exist. Use '/rwarp create " + warpName + "' to create it first."));
             return true;
