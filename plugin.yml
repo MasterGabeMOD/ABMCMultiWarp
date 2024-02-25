@@ -3,11 +3,10 @@ version: 1.0
 main: server.alanbecker.net.Warps
 api-version: 1.13
 author: MasterGabeMOD
-
 commands:
   rwarp:
-    description: Access the random warp commands or create a new warp
-    usage: "/rwarp <create|warpName>"
+    description: Access the random warp commands, create a new warp, or list all warps
+    usage: "/rwarp <create|warpName|list>"
   setpoint:
     description: Set a point for a specific warp
     usage: "/setpoint <warpName>"
@@ -21,4 +20,7 @@ permissions:
     default: op
   abmc.rwarp.teleport:
     description: Allows teleporting to warps
+    default: true
+  abmc.rwarp.list:
+    description: Allows listing all available warps
     default: true

@@ -12,8 +12,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.World;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 public class Warps extends JavaPlugin implements CommandExecutor {
     @Override
@@ -43,6 +45,12 @@ public class Warps extends JavaPlugin implements CommandExecutor {
                     return true;
                 }
                 return handleCreateWarpCommand(player, args, config);
+            } else if (args.length > 0 && "list".equalsIgnoreCase(args[0])) {
+                if (!player.hasPermission("abmc.rwarp.list")) {
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cYou do not have permission to list warps."));
+                    return true;
+                }
+                return handleListWarpsCommand(player, config);
             } else {
                 if (!player.hasPermission("abmc.rwarp.teleport")) {
                     player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cYou do not have permission to teleport to warps."));
@@ -75,6 +83,18 @@ public class Warps extends JavaPlugin implements CommandExecutor {
             this.saveConfig();
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Warp " + warpName + " created."));
         }
+        return true;
+    }
+
+    private boolean handleListWarpsCommand(Player player, FileConfiguration config) {
+        Set<String> warpNames = config.getConfigurationSection("warps").getKeys(false);
+        if (warpNames.isEmpty()) {
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7There are no warps set."));
+            return true;
+        }
+        List<String> sortedWarps = new ArrayList<>(warpNames);
+        Collections.sort(sortedWarps);
+        player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Warps: " + String.join(", ", sortedWarps)));
         return true;
     }
 
