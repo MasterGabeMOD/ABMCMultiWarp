@@ -164,4 +164,3 @@ public class Warps extends JavaPlugin implements CommandExecutor {
         return true;
     }
 }
-//Discord
