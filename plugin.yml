@@ -1,5 +1,5 @@
 name: ABMCMultiWarp
-version: 1.0
+version: 1.1
 main: server.alanbecker.net.Warps
 api-version: 1.13
 author: MasterGabeMOD
@@ -24,3 +24,7 @@ permissions:
   abmc.rwarp.list:
     description: Allows listing all available warps
     default: true
+  abmc.bypass.cooldown:
+    description: Allows bypassing the cooldown for warps
+    default: op
+

@@ -135,27 +135,37 @@ public class Warps extends JavaPlugin implements CommandExecutor {
             }
 
             Location loc = new Location(world, Double.parseDouble(coords[1]), Double.parseDouble(coords[2]), Double.parseDouble(coords[3]), Float.parseFloat(coords[4]), Float.parseFloat(coords[5]));
-            int delay = config.getInt("teleportDelay", 3);
 
-            Bukkit.getScheduler().runTask(this, () -> {
-                final int[] timeLeft = {delay};
-                Bukkit.getScheduler().runTaskTimer(this, (task) -> {
-                    if (timeLeft[0] > 0) {
-                        String actionBarMessage = ChatColor.translateAlternateColorCodes('&',
-                                config.getString("messages.actionBarTeleportDelay").replace("%delay%", String.valueOf(timeLeft[0]--)));
-                        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(actionBarMessage));
-                    } else {
-                        player.teleport(loc);
-                        String warpingMessage = ChatColor.translateAlternateColorCodes('&', config.getString("messages.warping").replace("%warp%", matchedWarpName));
-                        player.sendMessage(warpingMessage);
-                        task.cancel();
-                    }
-                }, 0, 20);
-            });
+            if (!player.hasPermission("abmc.bypass.cooldown")) {
+
+                int delay = config.getInt("teleportDelay", 3);
+                Bukkit.getScheduler().runTask(this, () -> {
+                    final int[] timeLeft = {delay};
+                    Bukkit.getScheduler().runTaskTimer(this, (task) -> {
+                        if (timeLeft[0] > 0) {
+                            String actionBarMessage = ChatColor.translateAlternateColorCodes('&',
+                                    config.getString("messages.actionBarTeleportDelay").replace("%delay%", String.valueOf(timeLeft[0]--)));
+                            player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(actionBarMessage));
+                        } else {
+                            player.teleport(loc);
+                            String warpingMessage = ChatColor.translateAlternateColorCodes('&', config.getString("messages.warping").replace("%warp%", matchedWarpName));
+                            player.sendMessage(warpingMessage);
+                            task.cancel();
+                        }
+                    }, 0, 20);
+                });
+            } else {
+                Bukkit.getScheduler().runTask(this, () -> {
+                    player.teleport(loc);
+                    String warpingMessage = ChatColor.translateAlternateColorCodes('&', config.getString("messages.warping").replace("%warp%", matchedWarpName));
+                    player.sendMessage(warpingMessage);
+                });
+            }
         });
 
         return true;
     }
+
 
     private boolean handleSetPointCommand(Player player, String[] args, FileConfiguration config) {
         if (args.length != 1) {
