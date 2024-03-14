@@ -9,8 +9,9 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.World;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -24,6 +25,8 @@ public class Warps extends JavaPlugin implements CommandExecutor {
         this.getCommand("setpoint").setExecutor(this);
         this.saveDefaultConfig();
         getConfig().addDefault("messages.warping", "&7Warping to %warp%");
+        getConfig().addDefault("messages.actionBarTeleportDelay", "&7Teleporting in %delay% seconds...");
+        getConfig().addDefault("teleportDelay", 3); 
         getConfig().options().copyDefaults(true);
         saveConfig();
     }
@@ -132,10 +135,22 @@ public class Warps extends JavaPlugin implements CommandExecutor {
             }
 
             Location loc = new Location(world, Double.parseDouble(coords[1]), Double.parseDouble(coords[2]), Double.parseDouble(coords[3]), Float.parseFloat(coords[4]), Float.parseFloat(coords[5]));
+            int delay = config.getInt("teleportDelay", 3);
+
             Bukkit.getScheduler().runTask(this, () -> {
-                player.teleport(loc);
-                String warpingMessage = ChatColor.translateAlternateColorCodes('&', getConfig().getString("messages.warping").replace("%warp%", matchedWarpName));
-                player.sendMessage(warpingMessage);
+                final int[] timeLeft = {delay};
+                Bukkit.getScheduler().runTaskTimer(this, (task) -> {
+                    if (timeLeft[0] > 0) {
+                        String actionBarMessage = ChatColor.translateAlternateColorCodes('&',
+                                config.getString("messages.actionBarTeleportDelay").replace("%delay%", String.valueOf(timeLeft[0]--)));
+                        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(actionBarMessage));
+                    } else {
+                        player.teleport(loc);
+                        String warpingMessage = ChatColor.translateAlternateColorCodes('&', config.getString("messages.warping").replace("%warp%", matchedWarpName));
+                        player.sendMessage(warpingMessage);
+                        task.cancel();
+                    }
+                }, 0, 20);
             });
         });
 
@@ -164,5 +179,3 @@ public class Warps extends JavaPlugin implements CommandExecutor {
         return true;
     }
 }
-
-//Retry Discord
