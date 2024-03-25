@@ -26,10 +26,11 @@ public class Warps extends JavaPlugin implements CommandExecutor {
         this.saveDefaultConfig();
         getConfig().addDefault("messages.warping", "&7Warping to %warp%");
         getConfig().addDefault("messages.actionBarTeleportDelay", "&7Teleporting in %delay% seconds...");
-        getConfig().addDefault("teleportDelay", 3); 
+        getConfig().addDefault("teleportDelay", 3);
         getConfig().options().copyDefaults(true);
         saveConfig();
     }
+
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -42,7 +43,14 @@ public class Warps extends JavaPlugin implements CommandExecutor {
         FileConfiguration config = this.getConfig();
 
         if ("rwarp".equalsIgnoreCase(label)) {
-            if (args.length > 0 && "create".equalsIgnoreCase(args[0])) {
+            if (args.length > 0 && "reload".equalsIgnoreCase(args[0])) {
+                if (!player.hasPermission("abmc.rwarp.reload")) {
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cYou do not have permission to reload."));
+                    return true;
+                }
+                reloadConfiguration(player);
+                return true;
+            } else if (args.length > 0 && "create".equalsIgnoreCase(args[0])) {
                 if (!player.hasPermission("abmc.create.rwarp")) {
                     player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cYou do not have permission to create warps."));
                     return true;
@@ -71,6 +79,11 @@ public class Warps extends JavaPlugin implements CommandExecutor {
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Command not recognized."));
             return true;
         }
+    }
+
+    private void reloadConfiguration(CommandSender sender) {
+        reloadConfig();
+        sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Configuration reloaded."));
     }
 
     private boolean handleCreateWarpCommand(Player player, String[] args, FileConfiguration config) {
