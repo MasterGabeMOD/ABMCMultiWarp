@@ -3,6 +3,8 @@ package server.alanbecker.net;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -30,7 +32,6 @@ public class Warps extends JavaPlugin implements CommandExecutor {
         getConfig().options().copyDefaults(true);
         saveConfig();
     }
-
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -159,6 +160,8 @@ public class Warps extends JavaPlugin implements CommandExecutor {
                             String actionBarMessage = ChatColor.translateAlternateColorCodes('&',
                                     config.getString("messages.actionBarTeleportDelay").replace("%delay%", String.valueOf(timeLeft[0]--)));
                             player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(actionBarMessage));
+                            player.getWorld().spawnParticle(Particle.PORTAL, player.getLocation(), 50, 0.5, 1, 0.5, 0.5);
+                            player.playSound(player.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, 0.5f, 1f);
                         } else {
                             player.teleport(loc);
                             String warpingMessage = ChatColor.translateAlternateColorCodes('&', config.getString("messages.warping").replace("%warp%", matchedWarpName));
@@ -191,6 +194,7 @@ public class Warps extends JavaPlugin implements CommandExecutor {
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Warp " + warpName + " does not exist. Use '/rwarp create " + warpName + "' to create it first."));
             return true;
         }
+
 
         List<String> points = config.getStringList("warps." + warpName);
         Location loc = player.getLocation();
