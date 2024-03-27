@@ -29,6 +29,12 @@ public class Warps extends JavaPlugin implements CommandExecutor {
         getConfig().addDefault("messages.warping", "&7Warping to %warp%");
         getConfig().addDefault("messages.actionBarTeleportDelay", "&7Teleporting in %delay% seconds...");
         getConfig().addDefault("teleportDelay", 3);
+        getConfig().addDefault("teleportEffect.particle", "PORTAL");
+        getConfig().addDefault("teleportEffect.count", 50);
+        getConfig().addDefault("teleportEffect.extra", 0.5);
+        getConfig().addDefault("teleportSound", "BLOCK_PORTAL_TRAVEL");
+        getConfig().addDefault("teleportSoundVolume", 0.5);
+        getConfig().addDefault("teleportSoundPitch", 1);
         getConfig().options().copyDefaults(true);
         saveConfig();
     }
@@ -160,8 +166,15 @@ public class Warps extends JavaPlugin implements CommandExecutor {
                             String actionBarMessage = ChatColor.translateAlternateColorCodes('&',
                                     config.getString("messages.actionBarTeleportDelay").replace("%delay%", String.valueOf(timeLeft[0]--)));
                             player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(actionBarMessage));
-                            player.getWorld().spawnParticle(Particle.PORTAL, player.getLocation(), 50, 0.5, 1, 0.5, 0.5);
-                            player.playSound(player.getLocation(), Sound.BLOCK_PORTAL_TRAVEL, 0.5f, 1f);
+                            Particle particle = Particle.valueOf(config.getString("teleportEffect.particle"));
+                            int count = config.getInt("teleportEffect.count");
+                            double extra = config.getDouble("teleportEffect.extra");
+                            player.getWorld().spawnParticle(particle, player.getLocation(), count, 0.5, 1, 0.5, extra);
+                            
+                            Sound sound = Sound.valueOf(config.getString("teleportSound"));
+                            float volume = (float) config.getDouble("teleportSoundVolume");
+                            float pitch = (float) config.getDouble("teleportSoundPitch");
+                            player.playSound(player.getLocation(), sound, volume, pitch);
                         } else {
                             player.teleport(loc);
                             String warpingMessage = ChatColor.translateAlternateColorCodes('&', config.getString("messages.warping").replace("%warp%", matchedWarpName));
