@@ -1,18 +1,21 @@
 name: ABMCMultiWarp
-version: 1.2
+version: 1.3
 main: server.alanbecker.net.Warps
 api-version: 1.13
 author: MasterGabeMOD
 commands:
   rwarp:
-    description: Access the random warp commands, create a new warp, list all warps, or reload the configuration
-    usage: "/rwarp <create|warpName|list|reload>"
+    description: Access the random warp commands, create a new warp, delete a warp, list all warps, or reload the configuration
+    usage: "/rwarp <create|delete|warpName|list|reload>"
   setpoint:
     description: Set a point for a specific warp
     usage: "/setpoint <warpName>"
 permissions:
   abmc.create.rwarp:
     description: Allows creation of new warps
+    default: op
+  abmc.delete.rwarp:
+    description: Allows deletion of warps
     default: op
   abmc.create.setpoint:
     description: Allows setting points for warps

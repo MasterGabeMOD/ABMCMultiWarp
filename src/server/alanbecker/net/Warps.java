@@ -63,6 +63,12 @@ public class Warps extends JavaPlugin implements CommandExecutor {
                     return true;
                 }
                 return handleCreateWarpCommand(player, args, config);
+            } else if (args.length > 0 && "delete".equalsIgnoreCase(args[0])) {
+                if (!player.hasPermission("abmc.delete.rwarp")) {
+                    player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cYou do not have permission to delete warps."));
+                    return true;
+                }
+                return handleDeleteWarpCommand(player, args, config);
             } else if (args.length > 0 && "list".equalsIgnoreCase(args[0])) {
                 if (!player.hasPermission("abmc.rwarp.list")) {
                     player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&cYou do not have permission to list warps."));
@@ -105,6 +111,22 @@ public class Warps extends JavaPlugin implements CommandExecutor {
             config.set("warps." + warpName, new ArrayList<>());
             this.saveConfig();
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Warp " + warpName + " created."));
+        }
+        return true;
+    }
+
+    private boolean handleDeleteWarpCommand(Player player, String[] args, FileConfiguration config) {
+        if (args.length != 2) {
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Usage: /rwarp delete <warpName>"));
+            return true;
+        }
+        String warpName = args[1].toLowerCase();
+        if (!config.contains("warps." + warpName)) {
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Warp " + warpName + " does not exist."));
+        } else {
+            config.set("warps." + warpName, null);
+            this.saveConfig();
+            player.sendMessage(ChatColor.translateAlternateColorCodes('&', "&7Warp " + warpName + " deleted."));
         }
         return true;
     }
